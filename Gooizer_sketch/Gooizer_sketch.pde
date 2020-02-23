@@ -5,7 +5,10 @@ import blobscanner.*;
 import peasy.*;
 
 Capture video;
+
 PImage processed;
+
+boolean calibrationComplete = false;
 
 color black = color(0,0,0);
 color white = color(255,255,255);
@@ -20,7 +23,6 @@ int calibrateColor;
 
 Detector bs;
 
-
 public void setup(){
   size(320, 240, JAVA2D);
   createGUI();
@@ -28,12 +30,11 @@ public void setup(){
   thresholdVal = 25;
   
   String[] cameras = Capture.list();
-  video = new Capture(this, 320,240);
+  video = new Capture(this, 320,240,"USB Video Device", 30);
   video.start();
   
   processed = createImage(video.width, video.height, RGB);
   bs = new Detector(this,0,0,320,240,255);
-  // Place your setup code here
   
 }
 
@@ -80,7 +81,11 @@ public void draw(){
       
         float d = dist(r1,g1,b1,r2,g2,b2);
         if(d < thresholdVal){
-          processed.pixels[loc] = white;
+          if(calibrationComplete){
+            processed.pixels[loc] = white;
+          }else{
+            processed.pixels[loc] = currentColor;
+          }
         }else {
           processed.pixels[loc] = black;
         }
@@ -88,18 +93,23 @@ public void draw(){
      processed.updatePixels();
      image(processed,0,0);
      
-     processed.filter(THRESHOLD);
-     bs.imageFindBlobs(processed);
-     bs.loadBlobsFeatures();
-     
-     for(int i = 0; i < bs.getBlobsNumber(); i++){
-       bs.drawBlobContour(i,color(255,0,0),2);
+     if(calibrationComplete){
+       processImageAndFindBlobs();
      }
-     //updatePixels();
-      }
+   }
  }else{
    image(video,0,0);
  }
+}
+
+void processImageAndFindBlobs(){
+  processed.filter(THRESHOLD);
+  bs.imageFindBlobs(processed);
+  bs.loadBlobsFeatures();
+     
+  for(int i = 0; i < bs.getBlobsNumber(); i++){
+     bs.drawBlobContour(i,color(255,0,0),2);
+  }
 }
 
 void mouseClicked(){
@@ -116,9 +126,6 @@ void mouseClicked(){
      third = video.pixels[loc];
      calibrate = 0;
      calibrated++;
-  }
-  if(calibrated == 3){
-    noLoop();
   }
 }
 // Use this method to add additional statements
