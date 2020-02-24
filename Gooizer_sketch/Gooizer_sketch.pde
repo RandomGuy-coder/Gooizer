@@ -98,9 +98,10 @@ public void draw(){
      processed.updatePixels();
      image(processed,0,0);
      
-     if(calibrationComplete){
+     
+   }
+   if(calibrationComplete){
        processImageAndFindBlobs();
-     }
    }
  }else{
    image(video,0,0);
@@ -122,10 +123,57 @@ void processImageAndFindBlobs(){
   processed.filter(THRESHOLD);
   bs.imageFindBlobs(processed);
   bs.loadBlobsFeatures();
-     
+  bs.findCentroids();
+  float ratio = (video.height-1)/3;
+  PVector[] edge;
+  PVector min;
+  PVector max;
+  println(bs.getBlobsNumber());
   for(int i = 0; i < bs.getBlobsNumber(); i++){
-     bs.drawBlobContour(i,color(255,0,0),2);
+    edge = bs.getEdgePoints(i);
+    min = new PVector(width,height);
+    max = new PVector(0,0);
+    
+    for(int k = 0; k < edge.length; k++){
+       if(edge[k].x < min.x ){
+         min.x = edge[k].x;
+         min.y = edge[k].y;
+    } else if(edge[k].x > max.x){
+         max.x = edge[k].x;
+         max.y = edge[k].y;
+    }
+    }
+    stroke(255,0,0);
+    float centroidY = bs.getCentroidY(i);
+    if(centroidY <= ratio){
+      min.y = ratio - min.y;
+      max.y = ratio - max.y;
+      sendMessage("color1", min, max, bs.getCentroidX(i), ratio - centroidY);
+      println("color1");
+    }else if(centroidY > ratio && centroidY <= ratio*2){
+      point(min.x,min.y);
+      point(min.x,min.y);
+      point(bs.getCentroidX(i), centroidY);
+      min.y = ratio*2 - min.y;
+      max.y = ratio*2 - max.y;
+      stroke(0,255,0);
+      point(min.x,min.y);
+      point(min.x,min.y);
+      point(bs.getCentroidX(i), ratio*2 - centroidY);
+      println("color2");
+      sendMessage("color2", min, max, bs.getCentroidX(i), ratio*2 - centroidY);
+    }else{
+      min.y = ratio*3 - min.y;
+      max.y = ratio*3 - max.y;
+      sendMessage("color3", min, max, bs.getCentroidX(i), ratio*3 - centroidY);
+      println("color3");
+    }
+  //   bs.drawBlobContour(i,color(255,0,0),2);
   }
+}
+
+void sendMessage(String colorType, PVector min, PVector max, float centroidX, float centroidY){
+  
 }
 
 void mouseClicked(){

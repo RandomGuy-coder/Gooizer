@@ -52,6 +52,7 @@ public void stop_event(GButton source, GEvent event) { //_CODE_:button1:741613:
 public void finalize_calibration(GButton source, GEvent event) { //_CODE_:button2:715230:
   println("button2 - GButton >> GEvent." + event + " @ " + millis());
   noLoop();
+  delay(1000);
   calibrationComplete = true;
 } //_CODE_:button2:715230:
 
