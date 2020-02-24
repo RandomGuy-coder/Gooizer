@@ -1,8 +1,9 @@
-// Need G4P library
-import g4p_controls.*;
-import processing.video.*;
 import blobscanner.*;
+import g4p_controls.*;
+import netP5.*;
+import oscP5.*;
 import peasy.*;
+import processing.video.*;
 
 Capture video;
 
@@ -10,18 +11,21 @@ PImage processed;
 
 boolean calibrationComplete = false;
 
+Detector bs;
+
 color black = color(0,0,0);
-color white = color(255,255,255);
 color first;
 color second;
 color third;
+color white = color(255,255,255);
 
-int calibrated = 0;
 int calibrate;
-int thresholdVal;
 int calibrateColor;
+int calibrated = 0;
+int thresholdVal;
 
-Detector bs;
+OscP5 oscP5;
+NetAddress myRemoteLocation;
 
 public void setup(){
   size(320, 240, JAVA2D);
@@ -29,13 +33,14 @@ public void setup(){
   customGUI();
   thresholdVal = 25;
   
+  myRemoteLocation = new NetAddress("127.0.0.1", 12001);
+  
   String[] cameras = Capture.list();
   video = new Capture(this, 320,240,"USB Video Device", 30);
   video.start();
   
   processed = createImage(video.width, video.height, RGB);
   bs = new Detector(this,0,0,320,240,255);
-  
 }
 
 void captureEvent(Capture video){
@@ -100,6 +105,17 @@ public void draw(){
  }else{
    image(video,0,0);
  }
+ drawPartitionLines();
+}
+
+void drawPartitionLines(){
+  stroke(255);
+  int y = video.height/3 - 1;
+  int x1 = 0;
+  int x2 = video.width - 1;
+  for(int i = 1; i <= 2; i++){
+    line(x1,y*i,x2,y*i);
+  }
 }
 
 void processImageAndFindBlobs(){
