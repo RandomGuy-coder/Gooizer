@@ -19,40 +19,39 @@ synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:contr
 } //_CODE_:controls_window:756554:
 
 public void threshold_change(GSlider source, GEvent event) { //_CODE_:threshold:411244:
-  println("threshold - GSlider >> GEvent." + event + " @ " + millis());
+  log("Threshold changed to value" + source.getValueI());
   thresholdVal = source.getValueI();
-  println("threshold is: " + threshold);
 } //_CODE_:threshold:411244:
 
 public void scan_event(GButton source, GEvent event) { //_CODE_:power:596391:
-  println("power - GButton >> GEvent." + event + " @ " + millis());
+  log("Scan button pressed");
   sendMessage("/stop");
   redraw();
 } //_CODE_:power:596391:
 
 public void calibrate1_click1(GButton source, GEvent event) { //_CODE_:calibrate1:837833:
-  println("calibrate1 - GButton >> GEvent." + event + " @ " + millis());
+  log("Calibrate color 1 button pressed");
   calibrationComplete = false;
   calibrate = 1;
 } //_CODE_:calibrate1:837833:
 
 public void calibrate2_click1(GButton source, GEvent event) { //_CODE_:calibrate2:893355:
-  println("calibrate2 - GButton >> GEvent." + event + " @ " + millis());
+  log("Calibrate color 2 button pressed");
   calibrate = 2;
 } //_CODE_:calibrate2:893355:
 
 public void calibrate3_click1(GButton source, GEvent event) { //_CODE_:calibrate3:200157:
-  println("calibrate3 - GButton >> GEvent." + event + " @ " + millis());
+  log("Calibrate color 3 button pressed");
   calibrate = 3;
 } //_CODE_:calibrate3:200157:
 
 public void stop_event(GButton source, GEvent event) { //_CODE_:button1:741613:
-  println("button1 - GButton >> GEvent." + event + " @ " + millis());
+  log("Stop button pressed");
   sendMessage("/stop");
 } //_CODE_:button1:741613:
 
 public void finalize_calibration(GButton source, GEvent event) { //_CODE_:button2:715230:
-  println("button2 - GButton >> GEvent." + event + " @ " + millis());
+  log("Finalize calibration pressed");
   noLoop();
   delay(1000);
   calibrationComplete = true;
