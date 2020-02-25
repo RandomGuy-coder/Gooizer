@@ -26,6 +26,7 @@ public void threshold_change(GSlider source, GEvent event) { //_CODE_:threshold:
 
 public void scan_event(GButton source, GEvent event) { //_CODE_:power:596391:
   println("power - GButton >> GEvent." + event + " @ " + millis());
+  sendMessage("/stop");
   redraw();
 } //_CODE_:power:596391:
 
@@ -46,7 +47,8 @@ public void calibrate3_click1(GButton source, GEvent event) { //_CODE_:calibrate
 } //_CODE_:calibrate3:200157:
 
 public void stop_event(GButton source, GEvent event) { //_CODE_:button1:741613:
-  println("button1 - GButton >> GEvent." + event + " @ " + millis()); 
+  println("button1 - GButton >> GEvent." + event + " @ " + millis());
+  sendMessage("/stop");
 } //_CODE_:button1:741613:
 
 public void finalize_calibration(GButton source, GEvent event) { //_CODE_:button2:715230:

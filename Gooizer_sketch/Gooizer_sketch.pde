@@ -32,7 +32,7 @@ public void setup(){
   createGUI();
   customGUI();
   thresholdVal = 25;
-  
+  oscP5 = new OscP5(this,12001);
   myRemoteLocation = new NetAddress("127.0.0.1", 12001);
   
   String[] cameras = Capture.list();
@@ -148,7 +148,9 @@ void processImageAndFindBlobs(){
     if(centroidY <= ratio){
       min.y = ratio - min.y;
       max.y = ratio - max.y;
-      sendMessage("color1", min, max, bs.getCentroidX(i), ratio - centroidY);
+      sendMessage("color1", min.x, min.y);
+      sendMessage("color1", bs.getCentroidX(i), ratio - centroidY);
+      sendMessage("color1", max.x, max.y);
       println("color1");
     }else if(centroidY > ratio && centroidY <= ratio*2){
       point(min.x,min.y);
@@ -158,22 +160,51 @@ void processImageAndFindBlobs(){
       max.y = ratio*2 - max.y;
       stroke(0,255,0);
       point(min.x,min.y);
-      point(min.x,min.y);
+      point(max.x,max.y);
       point(bs.getCentroidX(i), ratio*2 - centroidY);
       println("color2");
-      sendMessage("color2", min, max, bs.getCentroidX(i), ratio*2 - centroidY);
+      println(min.x + " " + min.y + " " + max.x + " " + max.y);
+      sendMessage("color2", min.x, min.y/ratio);
+      sendMessage("color2", bs.getCentroidX(i), (ratio*2 - centroidY)/ratio);
+      sendMessage("color2", max.x, max.y/ratio);
     }else{
       min.y = ratio*3 - min.y;
       max.y = ratio*3 - max.y;
-      sendMessage("color3", min, max, bs.getCentroidX(i), ratio*3 - centroidY);
+      stroke(0,0,255);
+      point(min.x,min.y);
+      point(max.x,max.y);
+      point(bs.getCentroidX(i), ratio*3 - centroidY);
+      sendMessage("color3", min.x, min.y/ratio);
+      sendMessage("color3", bs.getCentroidX(i), (ratio*3 - centroidY)/ratio);
+      sendMessage("color3", max.x, max.y/ratio);
       println("color3");
+      println(min.x + " " + min.y + " " + max.x + " " + max.y);
     }
-  //   bs.drawBlobContour(i,color(255,0,0),2);
+  bs.drawBlobContour(i,color(255,0,0),2);
   }
+  sendMessage("/play");
 }
 
-void sendMessage(String colorType, PVector min, PVector max, float centroidX, float centroidY){
+void sendMessage(String message) {
+  OscMessage myOscMessage = new OscMessage(message);
+  oscP5.send(myOscMessage, myRemoteLocation);
+}
+
+void sendMessage(String colorType, float x, float y){
   
+  OscMessage myOscMessage;
+  
+  if(colorType.equals("color1")) {
+    myOscMessage = new OscMessage("/color1");
+  } else if(colorType.equals("color2")){
+    myOscMessage = new OscMessage("/color2");
+  } else{
+    myOscMessage = new OscMessage("/color3");
+  }
+  println("sending " + x + " " + y);
+    myOscMessage.add(y);
+    myOscMessage.add(x);
+  oscP5.send(myOscMessage, myRemoteLocation);
 }
 
 void mouseClicked(){
