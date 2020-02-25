@@ -144,7 +144,7 @@ void processImageAndFindBlobs() {
   bs.loadBlobsFeatures();
   bs.findCentroids();
   
-  log("Number of blobs found" + bs.getBlobsNumber());
+  log("Number of blobs found " + bs.getBlobsNumber());
   
   float ratio = (video.height-1)/3;
   PVector[] edge;
@@ -211,6 +211,12 @@ void processImageAndFindBlobs() {
   sendMessage("/play");
 }
 
+void sendMissingPoints(String colorType, float x1, float x2, float y) {
+  for(int i = (int)x1+1; i < (int)x2; i++){
+    sendMessage(colorType, i,y);
+  }
+}
+
 void sendMessage(String message) {
   OscMessage myOscMessage = new OscMessage(message);
   oscP5.send(myOscMessage, myRemoteLocation);
@@ -227,9 +233,9 @@ void sendMessage(String colorType, float x, float y){
   } else{
     myOscMessage = new OscMessage("/color3");
   }
-  log("sending " + x + " " + y);
+  log("sending " + (int)x + " " + y);
   myOscMessage.add(y);
-  myOscMessage.add(x);
+  myOscMessage.add((int)x);
   oscP5.send(myOscMessage, myRemoteLocation);
 }
 
