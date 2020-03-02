@@ -28,7 +28,7 @@ OscP5 oscP5;
 NetAddress myRemoteLocation;
 
 public void setup() {
-  size(320, 240, JAVA2D);
+  size(640, 480, JAVA2D);
   createGUI();
   customGUI();
   thresholdVal = 25;
@@ -39,13 +39,13 @@ public void setup() {
   
   //set up the camera to the camera name
   String[] cameras = Capture.list();
-  video = new Capture(this, 320,240,"USB Video Device", 30);
+  video = new Capture(this, 640,480,"USB Video Device", 30);
   video.start();
   
   //processedImage is the buffer image created after processing the image from the camera
   processedImage = createImage(video.width, video.height, RGB);
   
-  bs = new Detector(this,0,0,320,240,255);
+  bs = new Detector(this,0,0,640,480,255);
   
   log("Setup complete");
 }
@@ -175,10 +175,16 @@ void processImageAndFindBlobs() {
     if(centroidY <= ratio) {
       min.y = ratio - min.y;
       max.y = ratio - max.y;
-      sendMessage("color1", min.x, min.y);
-      sendMessage("color1", bs.getCentroidX(i), ratio - centroidY);
-      sendMessage("color1", max.x, max.y);
-      println("color1");
+      stroke(255,0,0);
+      point(min.x,min.y);
+      point(max.x,max.y);
+      log("Current Blob: " + i + " is in color1");
+      println(min.x + " " + min.y + " " + max.x + " " + max.y);
+      sendMessage("color1", min.x, min.y/ratio);
+      sendMissingPoints("/color1", min.x, bs.getCentroidX(i), min.y/ratio);
+      sendMessage("color1", bs.getCentroidX(i), (ratio - centroidY)/ratio);
+      sendMissingPoints("/color1", bs.getCentroidX(i), max.x, (ratio - centroidY)/ratio);
+      sendMessage("color1", max.x, max.y/ratio);
     } else if(centroidY > ratio && centroidY <= ratio*2) {
       min.y = ratio*2 - min.y;
       max.y = ratio*2 - max.y;
@@ -186,11 +192,13 @@ void processImageAndFindBlobs() {
       point(min.x,min.y);
       point(max.x,max.y);
       point(bs.getCentroidX(i), ratio*2 - centroidY);
-      log("Current Blob:" + i + "is in color2");
+      log("Current Blob: " + i + " is in color2");
       log(min.x + " " + min.y + " " + max.x + " " + max.y);
-      sendMessage("color2", min.x, min.y/ratio);
-      sendMessage("color2", bs.getCentroidX(i), (ratio*2 - centroidY)/ratio);
-      sendMessage("color2", max.x, max.y/ratio);
+      sendMessage("/color2", min.x, min.y/ratio);
+      sendMissingPoints("/color2", min.x, bs.getCentroidX(i), min.y/ratio);
+      sendMessage("/color2", bs.getCentroidX(i), (ratio*2 - centroidY)/ratio);
+      sendMissingPoints("/color2", bs.getCentroidX(i), max.x, (ratio*2 - centroidY)/ratio);
+      sendMessage("/color2", max.x, max.y/ratio);
     }else{
       min.y = ratio*3 - min.y;
       max.y = ratio*3 - max.y;
@@ -198,11 +206,13 @@ void processImageAndFindBlobs() {
       point(min.x,min.y);
       point(max.x,max.y);
       point(bs.getCentroidX(i), ratio*3 - centroidY);
-      log("Current Blob:" + i + "is in color3");
+      log("Current Blob: " + i + " is in color3");
       println(min.x + " " + min.y + " " + max.x + " " + max.y);
-      sendMessage("color3", min.x, min.y/ratio);
-      sendMessage("color3", bs.getCentroidX(i), (ratio*3 - centroidY)/ratio);
-      sendMessage("color3", max.x, max.y/ratio);
+      sendMessage("/color3", min.x, min.y/ratio);
+      sendMissingPoints("/color3", min.x, bs.getCentroidX(i), min.y/ratio);
+      sendMessage("/color3", bs.getCentroidX(i), (ratio*3 - centroidY)/ratio);
+      sendMissingPoints("/color2", bs.getCentroidX(i), max.x, (ratio*3 - centroidY)/ratio);
+      sendMessage("/color3", max.x, max.y/ratio);
     }
   //draw the contours of the blobs
   bs.drawBlobContour(i,color(255,0,0),2);
@@ -211,9 +221,10 @@ void processImageAndFindBlobs() {
   sendMessage("/play");
 }
 
+//sends the points between the three points of the blob. Only for prototype 1.
 void sendMissingPoints(String colorType, float x1, float x2, float y) {
   for(int i = (int)x1+1; i < (int)x2; i++){
-    sendMessage(colorType, i,y);
+    sendMessage(colorType, i, y);
   }
 }
 
@@ -225,14 +236,8 @@ void sendMessage(String message) {
 void sendMessage(String colorType, float x, float y){
   
   OscMessage myOscMessage;
+  myOscMessage = new OscMessage(colorType);
   
-  if(colorType.equals("color1")) {
-    myOscMessage = new OscMessage("/color1");
-  } else if(colorType.equals("color2")){
-    myOscMessage = new OscMessage("/color2");
-  } else{
-    myOscMessage = new OscMessage("/color3");
-  }
   log("sending " + (int)x + " " + y);
   myOscMessage.add(y);
   myOscMessage.add((int)x);
