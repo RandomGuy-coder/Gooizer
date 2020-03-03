@@ -28,7 +28,8 @@ OscP5 oscP5;
 NetAddress myRemoteLocation;
 
 public void setup() {
-  size(640, 480, JAVA2D);
+  
+  size(320, 240, JAVA2D);
   createGUI();
   customGUI();
   thresholdVal = 25;
@@ -39,13 +40,13 @@ public void setup() {
   
   //set up the camera to the camera name
   String[] cameras = Capture.list();
-  video = new Capture(this, 640,480,"USB Video Device", 30);
+  video = new Capture(this, width, height,"USB Video Device", 30);
   video.start();
   
   //processedImage is the buffer image created after processing the image from the camera
   processedImage = createImage(video.width, video.height, RGB);
   
-  bs = new Detector(this,0,0,640,480,255);
+  bs = new Detector(this, 0, 0, width, height, 255);
   
   log("Setup complete");
 }
@@ -180,11 +181,11 @@ void processImageAndFindBlobs() {
       point(max.x,max.y);
       log("Current Blob: " + i + " is in color1");
       println(min.x + " " + min.y + " " + max.x + " " + max.y);
-      sendMessage("color1", min.x, min.y/ratio);
+      sendMessage("/color1", min.x, min.y/ratio);
       sendMissingPoints("/color1", min.x, bs.getCentroidX(i), min.y/ratio);
-      sendMessage("color1", bs.getCentroidX(i), (ratio - centroidY)/ratio);
+      sendMessage("/color1", bs.getCentroidX(i), (ratio - centroidY)/ratio);
       sendMissingPoints("/color1", bs.getCentroidX(i), max.x, (ratio - centroidY)/ratio);
-      sendMessage("color1", max.x, max.y/ratio);
+      sendMessage("/color1", max.x, max.y/ratio);
     } else if(centroidY > ratio && centroidY <= ratio*2) {
       min.y = ratio*2 - min.y;
       max.y = ratio*2 - max.y;
@@ -211,7 +212,7 @@ void processImageAndFindBlobs() {
       sendMessage("/color3", min.x, min.y/ratio);
       sendMissingPoints("/color3", min.x, bs.getCentroidX(i), min.y/ratio);
       sendMessage("/color3", bs.getCentroidX(i), (ratio*3 - centroidY)/ratio);
-      sendMissingPoints("/color2", bs.getCentroidX(i), max.x, (ratio*3 - centroidY)/ratio);
+      sendMissingPoints("/color3", bs.getCentroidX(i), max.x, (ratio*3 - centroidY)/ratio);
       sendMessage("/color3", max.x, max.y/ratio);
     }
   //draw the contours of the blobs
