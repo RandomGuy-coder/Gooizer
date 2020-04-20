@@ -4,12 +4,15 @@ import netP5.*;
 import oscP5.*;
 import peasy.*;
 import processing.video.*;
+import java.awt.*;
 
 Capture video;
 
 PImage processedImage;
 
 boolean calibrationComplete = false;
+boolean manualSelected = false;
+boolean automaticSelected = false;
 
 Detector bs;
 
@@ -26,6 +29,7 @@ int thresholdVal;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
+boolean running;
 
 public void setup() {
   
@@ -34,21 +38,33 @@ public void setup() {
   customGUI();
   thresholdVal = 25;
   
+  disableButtons();
+  
   //Netaddress and the port number at which pure data is listening
   oscP5 = new OscP5(this,12001);
   myRemoteLocation = new NetAddress("127.0.0.1", 12001);
   
   //set up the camera to the camera name
   String[] cameras = Capture.list();
-  video = new Capture(this, width, height,"USB Video Device", 30);
+  video = new Capture(this, width, height,"iBall Face2Face CHD 12.0 Webca", 60);
   video.start();
   
   //processedImage is the buffer image created after processing the image from the camera
   processedImage = createImage(video.width, video.height, RGB);
   
   bs = new Detector(this, 0, 0, width, height, 255);
-  
   log("Setup complete");
+}
+
+void disableButtons(){
+  scan.setEnabled(false);
+  scan.setVisible(false);
+  stop.setEnabled(false);
+  stop.setVisible(false);
+  automatic.setEnabled(false);
+  automatic.setVisible(false);
+  manual.setEnabled(false);
+  manual.setVisible(false);
 }
 
 //Captures the image from the video
@@ -126,6 +142,31 @@ public void draw() {
  }
  //draw the lines to divide the three sections. So, it's easier to set up gooizer
  drawPartitionLines();
+ if(automaticSelected){
+   log("Will wait 30 seconds before reScan.");
+   running = true;
+   thread("counter");
+   delay(30000);
+   if(manualSelected){
+     noLoop();
+     running = false;
+   }
+ }
+}
+
+void counter(){
+  int time = millis();
+  int count = 30;
+  while(running){
+    if(millis() - time == 1000){
+       count--;
+       time = millis();
+       timerField.setText("" + count);
+       if(count == 0){
+         running = false;
+       }
+    }
+  }
 }
 
 //draws line to divide sections
@@ -235,11 +276,9 @@ void sendMessage(String message) {
 }
 
 void sendMessage(String colorType, float x, float y){
-  
   OscMessage myOscMessage;
   myOscMessage = new OscMessage(colorType);
-  
-  log("sending " + (int)x + " " + y);
+  //log("sending " + (int)x + " " + y);
   myOscMessage.add(y);
   myOscMessage.add((int)x);
   oscP5.send(myOscMessage, myRemoteLocation);
@@ -251,14 +290,30 @@ void mouseClicked(){
      first = video.pixels[loc];
      calibrate = 0;
      calibrated++;
+     log("Color 1 calibrated");
   }else if(calibrate == 2) {
      second = video.pixels[loc];
      calibrate = 0;
      calibrated++;
+     log("Color 2 calibrated");
   }else if(calibrate == 3) {
      third = video.pixels[loc];
      calibrate = 0;
      calibrated++;
+     log("Color 3 calibrated");
+  }
+}
+
+void keyPressed(){
+  if(manualSelected){
+    if(key == 'S' || key == 's'){
+      log("Scan button pressed");
+      sendMessage("/play");
+      redraw();
+    }else if(key == 'E' || key == 'e'){
+      log("Stop button pressed");
+      sendMessage("/stop");
+    }
   }
 }
 
