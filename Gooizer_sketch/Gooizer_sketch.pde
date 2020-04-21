@@ -58,13 +58,9 @@ public void setup() {
 }
 
 void disableButtons(){
-  scan.setEnabled(false);
   scan.setVisible(false);
-  stop.setEnabled(false);
   stop.setVisible(false);
-  automatic.setEnabled(false);
   automatic.setVisible(false);
-  manual.setEnabled(false);
   manual.setVisible(false);
 }
 

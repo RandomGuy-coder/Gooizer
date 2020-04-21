@@ -51,14 +51,29 @@ public void stop_event(GButton source, GEvent event) { //_CODE_:stop:741613:
 } //_CODE_:stop:741613:
 
 public void finalize_calibration(GButton source, GEvent event) { //_CODE_:finalizeCalibration:715230:
-  log("Finalize calibration pressed");
-  noLoop();
-  delay(1000);
-  calibrationComplete = true;
-  automatic.setEnabled(true);
-  automatic.setVisible(true);
-  manual.setEnabled(true);
-  manual.setVisible(true);
+  if(!calibrationComplete){
+    log("Finalize calibration pressed");
+    noLoop();
+    delay(1000);
+    calibrationComplete = true;
+    automatic.setVisible(true);
+    manual.setVisible(true);
+    calibrate1.setEnabled(false);
+    calibrate2.setEnabled(false);
+    calibrate3.setEnabled(false);
+    source.setText("Recalibrate");
+  }else{
+    calibrationComplete = false;
+    calibrated = 0;
+    automatic.setVisible(false);
+    manual.setVisible(false);
+    scan.setVisible(false);
+    stop.setVisible(false);
+    calibrate1.setEnabled(true);
+    calibrate2.setEnabled(true);
+    calibrate3.setEnabled(true);
+    source.setText("Finalize Calibration");
+  }
 } //_CODE_:finalizeCalibration:715230:
 
 public void automatic_click(GButton source, GEvent event) { //_CODE_:automatic:878699:
@@ -69,9 +84,7 @@ public void automatic_click(GButton source, GEvent event) { //_CODE_:automatic:8
   timerField.setFont(new Font("Monospaced", Font.PLAIN,45));
   automaticSelected = true;
   manualSelected = false;
-  scan.setEnabled(false);
   scan.setVisible(false);
-  stop.setEnabled(false);
   stop.setVisible(false);
   automatic.setEnabled(false);
   manual.setEnabled(true);
@@ -79,9 +92,7 @@ public void automatic_click(GButton source, GEvent event) { //_CODE_:automatic:8
 
 public void manual_click(GButton source, GEvent event) { //_CODE_:manual:377157:
   log("Manual Selected");
-  scan.setEnabled(true);
   scan.setVisible(true);
-  stop.setEnabled(true);
   stop.setVisible(true);
   manualSelected = true;
   automaticSelected = false;
@@ -106,8 +117,10 @@ public void pitch_click(GButton source, GEvent event) { //_CODE_:pitch:524892:
 } //_CODE_:pitch:524892:
 
 synchronized public void live_feed_draw(PApplet appc, GWinData data) { //_CODE_:liveFeedWindow:222651:
-  appc.image(video,0,0);
-  drawPartitionLines(appc);
+  if(calibrationComplete){
+    appc.image(video,0,0);
+    drawPartitionLines(appc);
+  }
 } //_CODE_:liveFeedWindow:222651:
 
 
@@ -119,7 +132,7 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Gooizer");
-  controls_window = GWindow.getWindow(this, "controls", 0, 320, 480, 320, JAVA2D);
+  controls_window = GWindow.getWindow(this, "controls", 0, 300, 480, 320, JAVA2D);
   controls_window.noLoop();
   controls_window.setActionOnClose(G4P.KEEP_OPEN);
   controls_window.addDrawHandler(this, "win_draw1");
