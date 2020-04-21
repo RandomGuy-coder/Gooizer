@@ -73,6 +73,8 @@ public void automatic_click(GButton source, GEvent event) { //_CODE_:automatic:8
   scan.setVisible(false);
   stop.setEnabled(false);
   stop.setVisible(false);
+  automatic.setEnabled(false);
+  manual.setEnabled(true);
 } //_CODE_:automatic:878699:
 
 public void manual_click(GButton source, GEvent event) { //_CODE_:manual:377157:
@@ -85,6 +87,8 @@ public void manual_click(GButton source, GEvent event) { //_CODE_:manual:377157:
   automaticSelected = false;
   running = false;
   sendMessage("/stop");
+  automatic.setEnabled(true);
+  manual.setEnabled(false);
 } //_CODE_:manual:377157:
 
 public void timerField_change1(GTextField source, GEvent event) { //_CODE_:timerField:785677:
@@ -101,6 +105,11 @@ public void pitch_click(GButton source, GEvent event) { //_CODE_:pitch:524892:
   sendMessage("/pitch");
 } //_CODE_:pitch:524892:
 
+synchronized public void live_feed_draw(PApplet appc, GWinData data) { //_CODE_:liveFeedWindow:222651:
+  appc.image(video,0,0);
+  drawPartitionLines(appc);
+} //_CODE_:liveFeedWindow:222651:
+
 
 
 // Create all the GUI controls. 
@@ -110,7 +119,7 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Gooizer");
-  controls_window = GWindow.getWindow(this, "controls", 640, 480, 480, 320, JAVA2D);
+  controls_window = GWindow.getWindow(this, "controls", 0, 320, 480, 320, JAVA2D);
   controls_window.noLoop();
   controls_window.setActionOnClose(G4P.KEEP_OPEN);
   controls_window.addDrawHandler(this, "win_draw1");
@@ -158,7 +167,12 @@ public void createGUI(){
   pitch = new GButton(controls_window, 165, 255, 80, 30);
   pitch.setText("Pitch");
   pitch.addEventHandler(this, "pitch_click");
+  liveFeedWindow = GWindow.getWindow(this, "Live Feed", 0, 0, 320, 240, JAVA2D);
+  liveFeedWindow.noLoop();
+  liveFeedWindow.setActionOnClose(G4P.KEEP_OPEN);
+  liveFeedWindow.addDrawHandler(this, "live_feed_draw");
   controls_window.loop();
+  liveFeedWindow.loop();
 }
 
 // Variable declarations 
@@ -177,3 +191,4 @@ GTextField timerField;
 GLabel label1; 
 GButton amplitude; 
 GButton pitch; 
+GWindow liveFeedWindow;

@@ -168,7 +168,7 @@ void counter(){
   }
 }
 
-//draws line to divide sections
+//draw division lines on the main screen
 void drawPartitionLines() {
   stroke(255);
   int y = video.height/3 - 1;
@@ -176,6 +176,17 @@ void drawPartitionLines() {
   int x2 = video.width - 1;
   for(int i = 1; i <= 2; i++) {
     line(x1,y*i,x2,y*i);
+  }
+}
+
+//draw division lines on the live feed screen
+void drawPartitionLines(PApplet appc) {
+  appc.stroke(255);
+  int y = video.height/3 - 1;
+  int x1 = 0;
+  int x2 = video.width - 1;
+  for(int i = 1; i <= 2; i++) {
+    appc.line(x1,y*i,x2,y*i);
   }
 }
 
