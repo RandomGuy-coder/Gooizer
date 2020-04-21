@@ -62,9 +62,10 @@ public void finalize_calibration(GButton source, GEvent event) { //_CODE_:finali
 } //_CODE_:finalizeCalibration:715230:
 
 public void automatic_click(GButton source, GEvent event) { //_CODE_:automatic:878699:
-  log("Automatic Selected");
   sendMessage("/stop");
-  loop();
+  delay(1000);
+  log("Automatic Selected");
+  redraw();
   timerField.setFont(new Font("Monospaced", Font.PLAIN,45));
   automaticSelected = true;
   manualSelected = false;
@@ -82,7 +83,7 @@ public void manual_click(GButton source, GEvent event) { //_CODE_:manual:377157:
   stop.setVisible(true);
   manualSelected = true;
   automaticSelected = false;
-  noLoop();
+  running = false;
   sendMessage("/stop");
 } //_CODE_:manual:377157:
 

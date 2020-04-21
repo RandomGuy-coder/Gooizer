@@ -27,6 +27,7 @@ int calibrateColor;
 int calibrated = 0;
 int thresholdVal;
 
+final int playTime = 32;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 boolean running;
@@ -143,20 +144,16 @@ public void draw() {
  //draw the lines to divide the three sections. So, it's easier to set up gooizer
  drawPartitionLines();
  if(automaticSelected){
-   log("Will wait 30 seconds before reScan.");
    running = true;
    thread("counter");
-   delay(30000);
-   if(manualSelected){
-     noLoop();
-     running = false;
-   }
+   log("Will wait " + playTime + " seconds before reScan.");
  }
 }
 
+//counter is a thread and automatically re-scans after the set playTime
 void counter(){
   int time = millis();
-  int count = 30;
+  int count = playTime;
   while(running){
     if(millis() - time == 1000){
        count--;
@@ -164,6 +161,8 @@ void counter(){
        timerField.setText("" + count);
        if(count == 0){
          running = false;
+         sendMessage("/stop");
+         redraw();
        }
     }
   }
@@ -308,7 +307,7 @@ void keyPressed(){
   if(manualSelected){
     if(key == 'S' || key == 's'){
       log("Scan button pressed");
-      sendMessage("/play");
+      sendMessage("/stop");
       redraw();
     }else if(key == 'E' || key == 'e'){
       log("Stop button pressed");
