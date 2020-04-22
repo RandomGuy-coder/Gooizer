@@ -13,6 +13,7 @@ PImage processedImage;
 boolean calibrationComplete = false;
 boolean manualSelected = false;
 boolean automaticSelected = false;
+boolean pitchSelected = false;
 
 Detector bs;
 
@@ -167,9 +168,9 @@ void counter(){
 //draw division lines on the main screen
 void drawPartitionLines() {
   stroke(255);
-  int y = video.height/3 - 1;
-  int x1 = 0;
-  int x2 = video.width - 1;
+  float y = video.height/3 - 1;
+  float x1 = 0;
+  float x2 = video.width - 1;
   for(int i = 1; i <= 2; i++) {
     line(x1,y*i,x2,y*i);
   }
@@ -178,11 +179,18 @@ void drawPartitionLines() {
 //draw division lines on the live feed screen
 void drawPartitionLines(PApplet appc) {
   appc.stroke(255);
-  int y = video.height/3 - 1;
-  int x1 = 0;
-  int x2 = video.width - 1;
+  float y = video.height/3 - 1;
+  float x1 = 0;
+  float x2 = video.width - 1;
   for(int i = 1; i <= 2; i++) {
     appc.line(x1,y*i,x2,y*i);
+  }
+  if(pitchSelected){
+    appc.stroke(100);
+    y = y/2;
+    for(int i = 1; i <=5;i = i+2){
+      appc.line(x1,y*i,x2,y*i);
+    }
   }
 }
 
@@ -223,19 +231,23 @@ void processImageAndFindBlobs() {
     if(centroidY <= ratio) {
       min.y = ratio - min.y;
       max.y = ratio - max.y;
+      float centreY = (ratio - centroidY)/ratio;
+      float centreX = bs.getCentroidX(i);
       stroke(255,0,0);
       point(min.x,min.y);
       point(max.x,max.y);
       log("Current Blob: " + i + " is in color1");
-      println(min.x + " " + min.y + " " + max.x + " " + max.y);
+      log(min.x + " " + min.y + " " + max.x + " " + max.y);
       sendMessage("/color1", min.x, min.y/ratio);
-      sendMissingPoints("/color1", min.x, bs.getCentroidX(i), min.y/ratio);
-      sendMessage("/color1", bs.getCentroidX(i), (ratio - centroidY)/ratio);
-      sendMissingPoints("/color1", bs.getCentroidX(i), max.x, (ratio - centroidY)/ratio);
+      sendMissingPoints("/color1", min.x, min.y/ratio, centreX, centreY);
+      sendMessage("/color1", centreX, centreY);
+      sendMissingPoints("/color1", centreX, centreY, max.x, max.y/ratio);
       sendMessage("/color1", max.x, max.y/ratio);
     } else if(centroidY > ratio && centroidY <= ratio*2) {
       min.y = ratio*2 - min.y;
       max.y = ratio*2 - max.y;
+      float centreY = (ratio*2 - centroidY)/ratio;
+      float centreX = bs.getCentroidX(i);
       stroke(0,255,0);
       point(min.x,min.y);
       point(max.x,max.y);
@@ -243,23 +255,25 @@ void processImageAndFindBlobs() {
       log("Current Blob: " + i + " is in color2");
       log(min.x + " " + min.y + " " + max.x + " " + max.y);
       sendMessage("/color2", min.x, min.y/ratio);
-      sendMissingPoints("/color2", min.x, bs.getCentroidX(i), min.y/ratio);
-      sendMessage("/color2", bs.getCentroidX(i), (ratio*2 - centroidY)/ratio);
-      sendMissingPoints("/color2", bs.getCentroidX(i), max.x, (ratio*2 - centroidY)/ratio);
+      sendMissingPoints("/color2", min.x, min.y/ratio, centreX, centreY);
+      sendMessage("/color2", centreX, centreY);
+      sendMissingPoints("/color2", centreX, centreY, max.x, max.y/ratio);
       sendMessage("/color2", max.x, max.y/ratio);
     }else{
       min.y = ratio*3 - min.y;
       max.y = ratio*3 - max.y;
+      float centreY = (ratio*3 - centroidY)/ratio;
+      float centreX = bs.getCentroidX(i);
       stroke(0,0,255);
       point(min.x,min.y);
       point(max.x,max.y);
       point(bs.getCentroidX(i), ratio*3 - centroidY);
       log("Current Blob: " + i + " is in color3");
-      println(min.x + " " + min.y + " " + max.x + " " + max.y);
+      log(min.x + " " + min.y + " " + max.x + " " + max.y);
       sendMessage("/color3", min.x, min.y/ratio);
-      sendMissingPoints("/color3", min.x, bs.getCentroidX(i), min.y/ratio);
-      sendMessage("/color3", bs.getCentroidX(i), (ratio*3 - centroidY)/ratio);
-      sendMissingPoints("/color3", bs.getCentroidX(i), max.x, (ratio*3 - centroidY)/ratio);
+      sendMissingPoints("/color3", min.x, min.y/ratio, centreX, centreY);
+      sendMessage("/color3", centreX, centreY);
+      sendMissingPoints("/color3", centreX, centreY, max.x, max.y/ratio);
       sendMessage("/color3", max.x, max.y/ratio);
     }
   //draw the contours of the blobs
@@ -270,9 +284,13 @@ void processImageAndFindBlobs() {
 }
 
 //sends the points between the three points of the blob. Only for prototype 1.
-void sendMissingPoints(String colorType, float x1, float x2, float y) {
+void sendMissingPoints(String colorType, float x1, float y1, float x2, float y2) {
+  float rate = 1/(x2-x1);
+  float fixedRate = rate;
+  println("Interpolating");
   for(int i = (int)x1+1; i < (int)x2; i++){
-    sendMessage(colorType, i, y);
+    sendMessage(colorType, i, lerp(y1, y2, rate));
+    rate+= fixedRate;
   }
 }
 

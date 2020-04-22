@@ -109,11 +109,13 @@ public void timerField_change1(GTextField source, GEvent event) { //_CODE_:timer
 public void amplitude_click(GButton source, GEvent event) { //_CODE_:amplitude:647434:
   log("Amplitude has been selected");
   sendMessage("/amplitude");
+  pitchSelected = false;
 } //_CODE_:amplitude:647434:
 
 public void pitch_click(GButton source, GEvent event) { //_CODE_:pitch:524892:
   log("Pitch has been selected");
   sendMessage("/pitch");
+  pitchSelected = true;
 } //_CODE_:pitch:524892:
 
 synchronized public void live_feed_draw(PApplet appc, GWinData data) { //_CODE_:liveFeedWindow:222651:
@@ -136,7 +138,7 @@ public void createGUI(){
   controls_window.noLoop();
   controls_window.setActionOnClose(G4P.KEEP_OPEN);
   controls_window.addDrawHandler(this, "win_draw1");
-  threshold = new GSlider(controls_window, 85, 19, 300, 40, 10.0);
+  threshold = new GSlider(controls_window, 79, 20, 300, 40, 10.0);
   threshold.setShowValue(true);
   threshold.setShowLimits(true);
   threshold.setLimits(25, 0, 255);
@@ -180,6 +182,10 @@ public void createGUI(){
   pitch = new GButton(controls_window, 165, 255, 80, 30);
   pitch.setText("Pitch");
   pitch.addEventHandler(this, "pitch_click");
+  label2 = new GLabel(controls_window, -1, 29, 80, 20);
+  label2.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label2.setText("Threshold");
+  label2.setOpaque(false);
   liveFeedWindow = GWindow.getWindow(this, "Live Feed", 0, 0, 320, 240, JAVA2D);
   liveFeedWindow.noLoop();
   liveFeedWindow.setActionOnClose(G4P.KEEP_OPEN);
@@ -204,4 +210,5 @@ GTextField timerField;
 GLabel label1; 
 GButton amplitude; 
 GButton pitch; 
+GLabel label2; 
 GWindow liveFeedWindow;
