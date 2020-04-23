@@ -122,6 +122,19 @@ synchronized public void live_feed_draw(PApplet appc, GWinData data) { //_CODE_:
   if(calibrationComplete){
     appc.image(video,0,0);
     drawPartitionLines(appc);
+    if(playing){
+        if(indexNumber == (playTime*10)-1){
+          indexNumber = 0;
+          println("inital Frame: " + initalFrame);
+          println("final frame: " + liveFeedWindow.frameCount);
+        }else{
+          appc.stroke(255);
+          appc.line(indexNumber, 0, indexNumber, video.height-1);
+          if(appc.frameCount%12 ==0){
+            indexNumber++;
+          }
+        }
+    }
   }
 } //_CODE_:liveFeedWindow:222651:
 

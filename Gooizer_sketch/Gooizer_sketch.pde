@@ -14,6 +14,7 @@ boolean calibrationComplete = false;
 boolean manualSelected = false;
 boolean automaticSelected = false;
 boolean pitchSelected = false;
+boolean playing = false;
 
 Detector bs;
 
@@ -27,7 +28,8 @@ int calibrate;
 int calibrateColor;
 int calibrated = 0;
 int thresholdVal;
-
+int indexNumber = 0;
+int initalFrame = 0;
 final int playTime = 32;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -178,7 +180,7 @@ void drawPartitionLines() {
 
 //draw division lines on the live feed screen
 void drawPartitionLines(PApplet appc) {
-  appc.stroke(255);
+  liveFeedWindow.stroke(255);
   float y = video.height/3 - 1;
   float x1 = 0;
   float x2 = video.width - 1;
@@ -295,6 +297,14 @@ void sendMissingPoints(String colorType, float x1, float y1, float x2, float y2)
 }
 
 void sendMessage(String message) {
+  if(message.equals("/play")){
+    playing = true;
+    initalFrame = liveFeedWindow.frameCount;
+    println("playing true");
+  }else if(message.equals("/stop")){
+    playing = false;
+    println("playing false");
+  }
   OscMessage myOscMessage = new OscMessage(message);
   oscP5.send(myOscMessage, myRemoteLocation);
 }
