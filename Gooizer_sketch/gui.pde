@@ -31,18 +31,17 @@ public void scan_event(GButton source, GEvent event) { //_CODE_:scan:596391:
 
 public void calibrate1_click1(GButton source, GEvent event) { //_CODE_:calibrate1:837833:
   log("Calibrate color 1 button pressed");
-  calibrationComplete = false;
-  calibrate = 1;
+  calibrateColor = 1;
 } //_CODE_:calibrate1:837833:
 
 public void calibrate2_click1(GButton source, GEvent event) { //_CODE_:calibrate2:893355:
   log("Calibrate color 2 button pressed");
-  calibrate = 2;
+  calibrateColor = 2;
 } //_CODE_:calibrate2:893355:
 
 public void calibrate3_click1(GButton source, GEvent event) { //_CODE_:calibrate3:200157:
   log("Calibrate color 3 button pressed");
-  calibrate = 3;
+  calibrateColor = 3;
 } //_CODE_:calibrate3:200157:
 
 public void stop_event(GButton source, GEvent event) { //_CODE_:stop:741613:
@@ -72,6 +71,7 @@ public void finalize_calibration(GButton source, GEvent event) { //_CODE_:finali
     calibrate1.setEnabled(true);
     calibrate2.setEnabled(true);
     calibrate3.setEnabled(true);
+    loop();
     source.setText("Finalize Calibration");
   }
 } //_CODE_:finalizeCalibration:715230:
@@ -96,7 +96,7 @@ public void manual_click(GButton source, GEvent event) { //_CODE_:manual:377157:
   stop.setVisible(true);
   manualSelected = true;
   automaticSelected = false;
-  running = false;
+  runAutomaticTimer = false;
   sendMessage("/stop");
   automatic.setEnabled(true);
   manual.setEnabled(false);
@@ -123,10 +123,8 @@ synchronized public void live_feed_draw(PApplet appc, GWinData data) { //_CODE_:
     appc.image(video,0,0);
     drawPartitionLines(appc);
     if(playing){
-        if(indexNumber == (playTime*10)-1){
+        if(indexNumber == (PLAY_TIME*10)-1){
           indexNumber = 0;
-          println("inital Frame: " + initalFrame);
-          println("final frame: " + liveFeedWindow.frameCount);
         }else{
           appc.stroke(255);
           appc.line(indexNumber, 0, indexNumber, video.height-1);
