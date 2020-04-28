@@ -16,6 +16,20 @@
 
 synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:controls_window:756554:
   appc.background(230);
+  
+  //scan and stop with keys only works in manual mode
+  if(appc.keyPressed){
+    if(manualSelected){
+      if(appc.key == 'S' || appc.key == 's'){
+        log("Scan button pressed");
+        sendMessage("/stop");
+        redraw();
+      }else if(appc.key == 'E' || appc.key == 'e'){
+        log("Stop button pressed");
+        sendMessage("/stop");
+      }
+    }
+  }
 } //_CODE_:controls_window:756554:
 
 public void threshold_change(GSlider source, GEvent event) { //_CODE_:threshold:411244:
@@ -119,6 +133,7 @@ public void pitch_click(GButton source, GEvent event) { //_CODE_:pitch:524892:
 } //_CODE_:pitch:524892:
 
 synchronized public void live_feed_draw(PApplet appc, GWinData data) { //_CODE_:liveFeedWindow:222651:
+  //Draws line on screen depending on which x value is being read at that time.
   if(calibrationComplete){
     appc.image(video,0,0);
     drawPartitionLines(appc);

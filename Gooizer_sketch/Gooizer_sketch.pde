@@ -1,3 +1,8 @@
+/**
+*  Author: Tushar Mittal
+*  Student id: 16123921
+**/
+
 import blobscanner.*;
 import g4p_controls.*;
 import netP5.*;
@@ -48,7 +53,7 @@ public void setup() {
   oscP5 = new OscP5(this,12000);
   myRemoteLocation = new NetAddress("127.0.0.1", 12001);
   
-  //set up the camera for video capture
+  //set up the camera for video capture. Change the camera name and fps as per your camera capabilities.
   video = new Capture(this, width, height,"iBall Face2Face CHD 12.0 Webca", 60);
   video.start();
   
@@ -121,7 +126,7 @@ public void draw() {
         //finds distance between the color of the current pixel and the color selected for that section
         float d = dist(r1,g1,b1,r2,g2,b2);
         
-        //checks if the color is withing the threshold value, if not then replaces with black color
+        //checks if the color is within the threshold value, if not then replaces with black color
         if(d < thresholdVal) {
           if(calibrationComplete) {
             //if calibration has been completed shows the processed areas as white
@@ -145,12 +150,11 @@ public void draw() {
  } else {
    image(video,0,0);
  }
- //draw the lines to divide the three sections. So, it's easier to set up gooizer
  drawPartitionLines();
 }
 
 /**
- * draw division lines to seperate the sections on the Gooizer screen
+ * Draw division lines to seperate the sections on the Gooizer screen
  */
 void drawPartitionLines() {
   stroke(255);
@@ -163,7 +167,7 @@ void drawPartitionLines() {
 }
 
 /**
- * draw division lines on the live feed screen and if pitch is selected 
+ * Draw division lines on the live feed screen and if pitch is selected 
  * also display the mid line for each section.
  * 
  * @param appc Applet of the window to update.
@@ -371,6 +375,7 @@ void disableButtons(){
 
 void mouseClicked(){
   int loc = mouseX + mouseY*video.width;
+  
   if(calibrateColor == 1){
      first = video.pixels[loc];
      calibrateColor = 0;
@@ -389,22 +394,10 @@ void mouseClicked(){
   }
 }
 
-void keyPressed(){
-  if(manualSelected){
-    if(key == 'S' || key == 's'){
-      log("Scan button pressed");
-      sendMessage("/stop");
-      redraw();
-    }else if(key == 'E' || key == 'e'){
-      log("Stop button pressed");
-      sendMessage("/stop");
-    }
-  }
-}
-
 void log(String toLog){
   println(hour() + ":" + minute() + ":" +second() + " :- " + toLog);
 }
+
 // Use this method to add additional statements
 // to customise the GUI controls
 public void customGUI(){
