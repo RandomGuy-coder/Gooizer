@@ -4,4 +4,5 @@ Gooizer was final year project of my undergrad. It is a tangible user interface 
 It is programmed in Processing and PureData.
 
 ## Setup of the project
+Readme in progress
 
